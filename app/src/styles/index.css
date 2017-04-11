@@ -1,0 +1,31 @@
+body {
+    font-size: 20px;
+    background: #f80;
+
+.a,
+.b,
+.c {
+    width: 100px;
+    height: 100px;
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+.a {
+    background: url(../assets/icon-index/a.png);
+}
+
+.b {
+    background: url(../assets/icon-index/b.png);
+}
+
+.c {
+    background: url(../assets/HorizontalBg.png);
+}
+
+@media (iphone4) {
+    div {
+        width: 100pm;
+        height: 100rm;
+    }
+}
