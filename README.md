@@ -33,7 +33,6 @@ npm run wbuild
 
 ### 本地预览
 ```bash
-```bash
 npm run server
 ```
 
