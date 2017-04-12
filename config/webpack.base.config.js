@@ -21,7 +21,7 @@ const spritesmith = require('spritesmith');
 
 const sls = require('./utils');
 const PATHS = require('./PATHS');
-const setVendor = require('../set.vendor');
+const BASE = require('../base');
 const postcssFunc = require('./postcssFunc');
 
 //环境变量
@@ -32,39 +32,6 @@ const postcssMobilePlugs = [];
 
 
 
-//雪碧图相关代码
-
-
-function spritesGroupBy(image) {
-    let groups = /\/assets\/icons\/(.*?)\/.*/gi.exec(image.url);
-    let groupName = groups ? groups[1] : group;
-    image.retina = true;
-    image.ratio = 1;
-    if (groupName) {
-        let ratio = /@(\d+)x$/gi.exec(groupName);
-        if (ratio) {
-            ratio = ratio[1];
-            while (ratio > 10) {
-                ratio = ratio / 10;
-            }
-            image.ratio = ratio;
-        }
-    }
-    return Promise.resolve(groupName);
-}
-
-// function spritesOnUpdateRule(isDev, rule, comment, image) {
-//     var spriteUrl = image.spriteUrl;
-//     image.spriteUrl = '/public/' + spriteUrl;
-//     postcssSprites.updateRule(rule, comment, image);
-// }
-
-// function spritesOnSaveSpritesheet(isDev, opts, groups) {
-//     let file = postcssSprites.makeSpritesheetPath(opts, groups);
-//     return file;
-// }
-
-
 // 参数判断
 if (argv.env === 'mobile') {
     postcssMobilePlugs.push()
@@ -72,17 +39,12 @@ if (argv.env === 'mobile') {
 
 
 const config = {
-    entry: {
-        vendor: setVendor
-    },
-    entry: {
-        app: PATHS.SRC.join('js/app')
-    },
+    entry: Object.assign({ 'app': PATHS.SRC.join('js/app') }, BASE.vendors),
     output: {
         filename: 'js/[name].js',
         path: PATHS.DIST,
         // publicPath: PATHS.DIST,
-        chunkFilename: 'js/register/[id].[chunkhash:5].js'
+        chunkFilename: 'js/register/[id].[chunkHash:5].js'
     },
     devtool: !isProd ? 'cheap-source-map' : '',
     module: {
@@ -104,32 +66,6 @@ const config = {
                 'html-loader?minimize=false'
             ],
             include: [PATHS.SRC]
-        }, {
-            test: /\.(woff|woff2|eot|ttf|svg)(\?[a-z0-9]+)?$/,
-            use: [{
-                loader: 'url-loader',
-                options: {
-                    context: PATHS.SRC,
-                    name: '[path][name].[ext]',
-                    publicPath: '../',
-                    outputPath: '/',
-                    //limit: '10000'
-                }
-            }],
-            include: [PATHS.SRC]
-        }, {
-            test: /\.(gif|png|jpe?g|svg)$/i,
-            use: [{
-                loader: 'file-loader',
-                options: {
-                    context: PATHS.SRC,
-                    name: '[path][name].[ext]',
-                    publicPath: '../',
-                    outputPath: '/',
-                    limit: '20000'
-                }
-            }],
-            include: [PATHS.SRC]
         }]
     },
     resolve: {
@@ -147,9 +83,7 @@ const config = {
         }
     },
     plugins: [
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"development"'
-        }),
+        
         new webpack.ProvidePlugin({
             $: "jquery",
         }),
@@ -167,25 +101,42 @@ const config = {
                             spritesmith: {
                                 padding: 30
                             },
-                            spritePath: PATHS.SRC.join('/assets/sprites/'), 
+                            spritePath: PATHS.SRC.join('/assets/sprites/'),
                             stylesheetPath: PATHS.SRC.join('/styles/'),
                             basePath: '.',
                             hooks: {
                                 onUpdateRule: function(rule, token, image) {
-                                    updateRule(rule, token, image);
-                                    ['width', 'height'].forEach(function(prop) {
-                                        var value = image.coords[prop];
-                                        if (image.retina) {
-                                            value /= image.ratio;
-                                        }
-                                        rule.insertAfter(rule.last, postcss.decl({
-                                            prop: prop,
-                                            value: value + 'px'
-                                        }));
+                                    var backgroundSizeX = (image.spriteWidth / image.coords.width) * 100;
+                                    var backgroundSizeY = (image.spriteHeight / image.coords.height) * 100;
+                                    var backgroundPositionX = (image.coords.x / (image.spriteWidth - image.coords.width)) * 100;
+                                    var backgroundPositionY = (image.coords.y / (image.spriteHeight - image.coords.height)) * 100;
+
+                                    backgroundSizeX = isNaN(backgroundSizeX) ? 0 : backgroundSizeX;
+                                    backgroundSizeY = isNaN(backgroundSizeY) ? 0 : backgroundSizeY;
+                                    backgroundPositionX = isNaN(backgroundPositionX) ? 0 : backgroundPositionX;
+                                    backgroundPositionY = isNaN(backgroundPositionY) ? 0 : backgroundPositionY;
+
+                                    var backgroundImage = postcss.decl({
+                                        prop: 'background-image',
+                                        value: 'url(' + image.spriteUrl + ')'
                                     });
+
+                                    var backgroundSize = postcss.decl({
+                                        prop: 'background-size',
+                                        value: backgroundSizeX + '% ' + backgroundSizeY + '%'
+                                    });
+
+                                    var backgroundPosition = postcss.decl({
+                                        prop: 'background-position',
+                                        value: backgroundPositionX + '% ' + backgroundPositionY + '%'
+                                    });
+
+                                    rule.insertAfter(token, backgroundImage);
+                                    rule.insertAfter(backgroundImage, backgroundPosition);
+                                    rule.insertAfter(backgroundPosition, backgroundSize);
                                 },
                                 onSaveSpritesheet: function(opts, spritesheet) {
-                                    return `${opts.spritePath}${revHash(spritesheet.image)}.${spritesheet.extension}`;
+                                    return `${opts.spritePath}${revHash(spritesheet.image)}.${spritesheet.extension}`
                                 }
                             },
                             groupBy: function(image) {
@@ -202,8 +153,7 @@ const config = {
                                 if (!/((icon)-?([\w]*))/.test(image.url))
                                     return Promise.reject();
                                 return Promise.resolve();
-                            },
-
+                            }
                         }),
                         postcssFunc.calculatesn,
                         postcssFunc.postcssMedia,
@@ -218,8 +168,8 @@ const config = {
                             core: true,
                             reduceIdents: false,
                             svgo: false
-                        }),
-                        ...postcssMobilePlugs
+                        })
+                        // ...postcssMobilePlugs
                     ];
                 }
             }

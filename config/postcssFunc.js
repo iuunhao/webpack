@@ -1,3 +1,4 @@
+const BASE = require('../base');
 const postcssFunc = {
     calculatesn: function(css) {
         css.walkRules(function(rule) {
@@ -6,7 +7,7 @@ const postcssFunc = {
                     return (parseFloat(str) / 2) + 'px';
                 });
                 decl.value = decl.value.replace(/(\d*\.?\d+)rm/ig, function(str) {
-                    return (parseFloat(str) / 64) + 'rem';
+                    return (parseFloat(str) / (BASE.designSize / 10)) + 'rem';
                 })
             })
         });
@@ -52,4 +53,3 @@ const postcssFunc = {
     }
 }
 module.exports = postcssFunc;
-    

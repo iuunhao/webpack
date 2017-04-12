@@ -5,17 +5,20 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const merge = require('webpack-merge');
 
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const FastUglifyJsPlugin = require('fast-uglifyjs-plugin');
 
 const baseWebpackConfig = require('./webpack.base.config');
 const PATHS = require('./PATHS');
+const BASE = require('../base');
 
 
 console.log(`生产环境当前为: ${baseWebpackConfig.ENV === 'mobile' ? '\033[0;36m移动\033[0m' : '\033[0;36m桌面\033[0m'} 端编译\n`);
 module.exports = merge(baseWebpackConfig.config, {
     output: {
         filename: 'js/[name].js',
-        path: path.resolve(__dirname, '../app/dist/')
+        path: PATHS.DIST,
+        // publicPath: PATHS.DIST,
+        chunkFilename: 'js/register/[id].[chunkHash:5].js'
     },
     module: {
         rules: [{
@@ -36,6 +39,31 @@ module.exports = merge(baseWebpackConfig.config, {
                 use: ['css-loader', 'postcss-loader', 'stylus-loader']
             }),
             include: [PATHS.SRC]
+        }, {
+            test: /\.(woff|woff2|eot|ttf|svg)(\?[a-z0-9]+)?$/,
+            use: [{
+                loader: 'url-loader',
+                options: {
+                    context: PATHS.SRC,
+                    name: '[path][name].[ext]',
+                    publicPath: BASE.serverPath,
+                    outputPath: './',
+                }
+            }],
+            include: [PATHS.SRC]
+        }, {
+            test: /\.(gif|png|jpe?g|svg)$/i,
+            use: [{
+                loader: 'file-loader',
+                options: {
+                    context: PATHS.SRC,
+                    name: '[path][name].[ext]',
+                    publicPath: BASE.serverPath,
+                    outputPath: './',
+                    limit: '20000'
+                }
+            }],
+            include: [PATHS.SRC]
         }]
     },
     plugins: [
@@ -55,11 +83,12 @@ module.exports = merge(baseWebpackConfig.config, {
             }
         }),
         new ExtractTextPlugin('css/mian.min.css'),
-        new UglifyJSPlugin({
-            sourceMap: false,
+        new FastUglifyJsPlugin({
             compress: {
-                warnings: true
-            }
+                warnings: false
+            },
+            debug: true,
+            workerNum: 4
         })
     ]
 })

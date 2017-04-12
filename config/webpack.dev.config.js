@@ -6,6 +6,7 @@ const ip = require('ip');
 const merge = require('webpack-merge');
 const baseWebpackConfig = require('./webpack.base.config');
 const PATHS = require('./PATHS');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
@@ -35,6 +36,18 @@ module.exports = merge(baseWebpackConfig.config, {
             use: ['style-loader', 'css-loader', 'postcss-loader', 'stylus-loader'],
             include: [PATHS.SRC],
         }, {
+            test: /\.(woff|woff2|eot|ttf|svg)(\?[a-z0-9]+)?$/,
+            use: [{
+                loader: 'url-loader',
+                options: {
+                    context: PATHS.SRC,
+                    name: '[path][name].[ext]',
+                    publicPath: '../',
+                    outputPath: './',
+                }
+            }],
+            include: [PATHS.SRC]
+        }, {
             test: /\.(gif|png|jpe?g|svg)$/i,
             use: [{
                 loader: 'file-loader',
@@ -42,9 +55,8 @@ module.exports = merge(baseWebpackConfig.config, {
                     context: PATHS.SRC,
                     name: '[path][name].[ext]',
                     publicPath: '../',
-                    outputPath: '/',
+                    outputPath: './',
                     limit: '20000'
-
                 }
             }],
             include: [PATHS.SRC]
@@ -52,6 +64,11 @@ module.exports = merge(baseWebpackConfig.config, {
     },
 
     plugins: [
+        new CleanWebpackPlugin(['sprites'], {
+            root: PATHS.SRC.join('assets'),
+            verbose: true,
+            dry: false
+        }),
         new FriendlyErrorsWebpackPlugin(),
         new webpack.HotModuleReplacementPlugin()
     ]

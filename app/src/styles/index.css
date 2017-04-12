@@ -1,31 +1,13 @@
-body {
-    font-size: 20px;
-    background: #f80;
-
-.a,
-.b,
-.c {
-    width: 100px;
-    height: 100px;
-    border: 1px solid #fff;
-    color: #fff;
+.icon1 {
+    width: 96rm;
+    height: 96rm;
+    background: url(../assets/icon-index/img1.png);
 }
-
-.a {
-    background: url(../assets/icon-index/a.png);
+.icon2 {
+    width: 94rm;
+    height: 88rm;
+    background: url(../assets/icon-index/img2.png);
 }
-
-.b {
-    background: url(../assets/icon-index/b.png);
-}
-
-.c {
-    background: url(../assets/HorizontalBg.png);
-}
-
-@media (iphone4) {
-    div {
-        width: 100pm;
-        height: 100rm;
-    }
+div{
+    color:blue
 }
