@@ -1,6 +1,11 @@
 # webpack-config
 
-> 为了提高依赖安装速度，建议先安装国内淘宝的CNPM
+[![GitHub stars](https://img.shields.io/github/stars/iuunhao/webpack.svg)](https://github.com/iuunhao/webpack/stargazers) [![GitHub forks](https://img.shields.io/github/forks/iuunhao/webpack.svg)](https://github.com/iuunhao/webpack/network) [![GitHub issues](https://img.shields.io/github/issues/iuunhao/webpack.svg)](https://github.com/iuunhao/webpack/issues) [![close issues](https://img.shields.io/github/issues-closed-raw/iuunhao/webpack.svg)](https://github.com/iuunhao/webpack) [![contributors](https://img.shields.io/github/contributors/iuunhao/webpack.svg)]() [![language](https://img.shields.io/badge/language-%E4%B8%AD%E6%96%87-ff69b4.svg)]()
+<br>
+---
+
+为了提高依赖安装速度，建议先安装国内淘宝的CNPM
+
 ```
 $ npm install -g cnpm --registry=https://registry.npm.taobao.org
 ```
