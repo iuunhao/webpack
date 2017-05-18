@@ -5,7 +5,8 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const merge = require('webpack-merge');
 
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
-const FastUglifyJsPlugin = require('fast-uglifyjs-plugin');
+// const FastUglifyJsPlugin = require('fast-uglifyjs-plugin');
+// const UglifyJSPlugin = require('uglifyjs-webpack-plugin'); 
 
 const baseWebpackConfig = require('./webpack.base.config');
 const PATHS = require('./PATHS');
@@ -83,12 +84,11 @@ module.exports = merge(baseWebpackConfig.config, {
             }
         }),
         new ExtractTextPlugin('css/mian.min.css'),
-        new FastUglifyJsPlugin({
+       
+        new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false
-            },
-            debug: true,
-            workerNum: 4
+            }
         })
     ]
 })

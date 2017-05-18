@@ -1,0 +1,9 @@
+doctype html
+html
+    head
+            title hello pug 
+    body
+        h1 pug pug
+
+    
+

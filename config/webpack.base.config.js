@@ -44,7 +44,7 @@ const config = {
         filename: 'js/[name].js',
         path: PATHS.DIST,
         // publicPath: PATHS.DIST,
-        chunkFilename: 'js/register/[id].[chunkHash:5].js'
+        chunkFilename: 'js/register/[id].[chunkHash:5].js',
     },
     devtool: !isProd ? 'cheap-source-map' : '',
     module: {
@@ -169,7 +169,6 @@ const config = {
                             reduceIdents: false,
                             svgo: false
                         })
-                        // ...postcssMobilePlugs
                     ];
                 }
             }
@@ -206,7 +205,6 @@ sls.template.forEach(function(page, item, arr) {
             break;
     }
 });
-
 
 module.exports = {
     config,
